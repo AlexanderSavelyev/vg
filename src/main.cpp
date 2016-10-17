@@ -8830,7 +8830,11 @@ int main_sort(int argc, char *argv[]) {
     string file_name = "";
     string reference_name = "";
     bool without_grooming = false;
+    
+    
     int c;
+    
+    std::cin >> c;
     while (true) {
         static struct option long_options[] =
             {
@@ -8880,8 +8884,8 @@ int main_sort(int argc, char *argv[]) {
     }
     
     ifstream in;
-    in.open(file_name.c_str());        
-    VG* graph = nullptr; 
+    in.open(file_name.c_str());
+    VG* graph = nullptr;
     if (gfa_input) {
         graph = new VG;
         graph->from_gfa(in);
