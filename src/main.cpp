@@ -8885,12 +8885,13 @@ int main_sort(int argc, char *argv[]) {
     
     ifstream in;
     in.open(file_name.c_str());
-    VG* graph = nullptr;
+    unique_ptr<VG> graph;
+    
     if (gfa_input) {
-        graph = new VG;
+        graph.reset(new VG);
         graph->from_gfa(in);
     } else {
-        graph = new VG(in);
+        graph.reset(new VG(in));
     }
         
     graph->max_flow(reference_name);
@@ -8903,7 +8904,6 @@ int main_sort(int argc, char *argv[]) {
         outfile.close();
     }
 //    graph->serialize_to_ostream(std::cout);
-    delete graph;  
     in.close();
     return 0;
 }
