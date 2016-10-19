@@ -8834,7 +8834,6 @@ int main_sort(int argc, char *argv[]) {
     
     int c;
     
-    std::cin >> c;
     while (true) {
         static struct option long_options[] =
             {

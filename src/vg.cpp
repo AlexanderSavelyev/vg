@@ -4,10 +4,18 @@
 #include "vg.pb.h"
 #include <raptor2/raptor2.h>
 
+
 namespace vg {
 
 using namespace std;
 using namespace gfak;
+
+#define debug 1
+
+
+#ifdef debug
+#include <jansson.h>
+#endif
 
 
 // construct from a stream of protobufs
@@ -10300,9 +10308,25 @@ void VG::orient_nodes_forward(set<id_t>& nodes_flipped) {
 
 }
 
+
+
 void VG::max_flow(const string& ref_name, bool isGrooming) {
     if (size() <= 1) return;
     // Topologically sort, which orders and orients all the nodes.
+    #ifdef debug
+    {
+        cerr << "######## Start debug test input any symbol\n";
+        char r;
+        std::cin >> r;
+        
+        json_t* js_graph = json_object();
+        
+        char* s = NULL;
+        s = json_dumps(js_graph, 0);
+        puts(s);
+        json_decref(js_graph);
+    }
+    #endif
     list<NodeTraversal> sorted_nodes;
     paths.sort_by_mapping_rank();
     max_flow_sort(sorted_nodes, ref_name, isGrooming);
