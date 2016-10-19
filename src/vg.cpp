@@ -10313,20 +10313,7 @@ void VG::orient_nodes_forward(set<id_t>& nodes_flipped) {
 void VG::max_flow(const string& ref_name, bool isGrooming) {
     if (size() <= 1) return;
     // Topologically sort, which orders and orients all the nodes.
-    #ifdef debug
-    {
-        cerr << "######## Start debug test input any symbol\n";
-        char r;
-        std::cin >> r;
-        
-        json_t* js_graph = json_object();
-        
-        char* s = NULL;
-        s = json_dumps(js_graph, 0);
-        puts(s);
-        json_decref(js_graph);
-    }
-    #endif
+    
     list<NodeTraversal> sorted_nodes;
     paths.sort_by_mapping_rank();
     max_flow_sort(sorted_nodes, ref_name, isGrooming);
@@ -10456,6 +10443,22 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
     set<id_t> unsorted_nodes(nodes.begin(), nodes.end());
     InOutGrowth growth = InOutGrowth(nodes, backbone, reference);
     find_in_out_web(sorted_nodes, growth, weighted_graph, unsorted_nodes);
+    
+    
+    #ifdef debug
+    {
+        cerr << "######## Start debug test input any symbol\n";
+        char r;
+        std::cin >> r;
+        
+        json_t* js_graph = json_object();
+        
+        char* s = NULL;
+        s = json_dumps(js_graph, 0);
+        puts(s);
+        json_decref(js_graph);
+    }
+    #endif
    
     while (sorted_nodes.size() != graph.node_size()) {
         cerr << "additional sorting for missing nodes" << endl;
