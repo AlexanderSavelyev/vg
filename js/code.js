@@ -40,11 +40,12 @@ document.addEventListener('DOMContentLoaded', function(){ // on dom ready
               'text-opacity': 0
             }),
         
-        elements: data,
+        elements: data.graph,
         
         layout: {
-          name: 'grid',
-          padding: 10
+          name: 'breadthfirst',
+          padding: 10,
+          roots: data.reference
         }
       });
 

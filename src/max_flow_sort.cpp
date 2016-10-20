@@ -18,6 +18,84 @@ namespace vg {
 using namespace std;
 using namespace gfak;
 
+#ifdef debug
+
+static void visualize_graph(VG& vg, list<id_t>& reference) {
+//        cerr << "######## Start debug test input any symbol\n";
+    json_t* js_root = json_object();
+    
+    
+    json_t* js_graph = json_object();
+    json_t* js_nodes = json_array();
+    json_t* js_edges = json_array();
+
+
+    for (auto &node : vg.node_index) {
+//            cerr << "node " << node.second << endl;
+        json_t* js_node = json_object();
+
+        std::string s_id = std::to_string(node.second);
+        json_t* js_id = json_string(s_id.c_str());
+
+        json_object_set(js_node, "id", js_id);
+        json_object_set(js_node, "name", js_id);
+
+        json_t* js_data = json_object();
+        json_object_set(js_data, "data", js_node);
+        json_array_append(js_nodes, js_data);
+    }
+
+    for (auto &edge : vg.edge_index)
+    {
+        json_t* js_edge = json_object();
+        id_t from = edge.first->from();
+        id_t to = edge.first->to();
+        
+        if(from == 55 || to == 55) {
+            continue;
+        }
+
+        std::string s_id = std::to_string(from);
+        std::string t_id = std::to_string(to);
+        
+
+
+        json_object_set(js_edge, "source", json_string(s_id.c_str()));
+        json_object_set(js_edge, "target", json_string(t_id.c_str()));
+
+        json_t* js_data = json_object();
+        json_object_set(js_data, "data", js_edge);
+        json_array_append(js_edges, js_data);
+    }
+    json_object_set(js_graph, "nodes", js_nodes);
+    json_object_set(js_graph, "edges", js_edges);
+    
+    
+    json_object_set(js_root, "graph", js_graph);
+    
+    json_t* js_ref = json_array();
+    
+    for(auto& r: reference) {
+        string rs = std::to_string(r);
+        json_array_append(js_ref, json_string(rs.c_str()));
+    }
+    
+    json_object_set(js_root, "reference", js_ref);
+
+    char* js_dump = NULL;
+    js_dump = json_dumps(js_root, 0);
+
+//        puts(s);
+
+    ofstream data_js;
+    data_js.open ("js/data.json");
+    data_js << js_dump;
+    data_js.close();
+    json_decref(js_graph);
+}
+
+#endif
+
 void VG::max_flow(const string& ref_name, bool isGrooming) {
     if (size() <= 1) return;
     // Topologically sort, which orders and orients all the nodes.
@@ -147,70 +225,22 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
     for (auto const &entry : node_by_id) {
         nodes.insert(entry.first);
     }
+    
+        
+    #ifdef debug
+    {
+        visualize_graph(*this, reference);
+//        for(auto& p : reference) {
+//            cerr << p << endl;
+//        }
+    }
+    #endif
 
     set<id_t> unsorted_nodes(nodes.begin(), nodes.end());
     InOutGrowth growth = InOutGrowth(nodes, backbone, reference);
     find_in_out_web(sorted_nodes, growth, weighted_graph, unsorted_nodes);
     
-    
-    #ifdef debug
-    {
-        cerr << "######## Start debug test input any symbol\n";
-//        char r;
-//        std::cin >> r;
-        
-        json_t* js_graph = json_object();
-        json_t* js_nodes = json_array();
-        json_t* js_edges = json_array();
-        
-        
-        for (auto &node : node_index) {
-//            cerr << "node " << node.second << endl;
-            
-            json_t* js_node = json_object();
-            
-            std::string s_id = std::to_string(node.second);
-            json_t* js_id = json_string(s_id.c_str());
-            
-            json_object_set(js_node, "id", js_id);
-            json_object_set(js_node, "name", js_id);
-            
-            json_t* js_data = json_object();
-            json_object_set(js_data, "data", js_node);
-            json_array_append(js_nodes, js_data);
-        }
-        
-        for (auto &edge : edge_index)
-        {
-            json_t* js_edge = json_object();
-            id_t from = edge.first->from();
-            id_t to = edge.first->to();
-            
-            std::string s_id = std::to_string(from);
-            std::string t_id = std::to_string(to);
-            
-            json_object_set(js_edge, "source", json_string(s_id.c_str()));
-            json_object_set(js_edge, "target", json_string(t_id.c_str()));
-            
-            json_t* js_data = json_object();
-            json_object_set(js_data, "data", js_edge);
-            json_array_append(js_edges, js_data);
-        }
-        json_object_set(js_graph, "nodes", js_nodes);
-        json_object_set(js_graph, "edges", js_edges);
-        
-        char* js_dump = NULL;
-        js_dump = json_dumps(js_graph, 0);
-        
-//        puts(s);
-        
-        ofstream data_js;
-        data_js.open ("js/data.json");
-        data_js << js_dump;
-        data_js.close();
-        json_decref(js_graph);
-    }
-    #endif
+
    
     while (sorted_nodes.size() != graph.node_size()) {
         cerr << "additional sorting for missing nodes" << endl;
