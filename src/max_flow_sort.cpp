@@ -156,26 +156,58 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
     #ifdef debug
     {
         cerr << "######## Start debug test input any symbol\n";
-        char r;
-        std::cin >> r;
+//        char r;
+//        std::cin >> r;
         
         json_t* js_graph = json_object();
+        json_t* js_nodes = json_array();
+        json_t* js_edges = json_array();
+        
         
         for (auto &node : node_index) {
-            cerr << "node " << node.second << endl;
+//            cerr << "node " << node.second << endl;
+            
+            json_t* js_node = json_object();
+            
+            std::string s_id = std::to_string(node.second);
+            json_t* js_id = json_string(s_id.c_str());
+            
+            json_object_set(js_node, "id", js_id);
+            json_object_set(js_node, "name", js_id);
+            
+            json_t* js_data = json_object();
+            json_object_set(js_data, "data", js_node);
+            json_array_append(js_nodes, js_data);
         }
         
         for (auto &edge : edge_index)
         {
+            json_t* js_edge = json_object();
             id_t from = edge.first->from();
             id_t to = edge.first->to();
             
-            cerr << "from " << from << endl;;
+            std::string s_id = std::to_string(from);
+            std::string t_id = std::to_string(to);
+            
+            json_object_set(js_edge, "source", json_string(s_id.c_str()));
+            json_object_set(js_edge, "target", json_string(t_id.c_str()));
+            
+            json_t* js_data = json_object();
+            json_object_set(js_data, "data", js_edge);
+            json_array_append(js_edges, js_data);
         }
+        json_object_set(js_graph, "nodes", js_nodes);
+        json_object_set(js_graph, "edges", js_edges);
         
-        char* s = NULL;
-        s = json_dumps(js_graph, 0);
-        puts(s);
+        char* js_dump = NULL;
+        js_dump = json_dumps(js_graph, 0);
+        
+//        puts(s);
+        
+        ofstream data_js;
+        data_js.open ("js/data.json");
+        data_js << js_dump;
+        data_js.close();
         json_decref(js_graph);
     }
     #endif
