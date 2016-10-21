@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function(){ // on dom ready
               'target-arrow-shape': 'triangle',
               'target-arrow-color': '#ccc',
               'line-color': '#ccc',
+              'label': 'data(label)',
               'width': 1
             })
           .selector(':selected')

@@ -18,9 +18,10 @@ namespace vg {
 using namespace std;
 using namespace gfak;
 
+
 #ifdef debug
 
-static void visualize_graph(VG& vg, list<id_t>& reference) {
+static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& reference) {
 //        cerr << "######## Start debug test input any symbol\n";
     json_t* js_root = json_object();
     
@@ -30,16 +31,19 @@ static void visualize_graph(VG& vg, list<id_t>& reference) {
     json_t* js_edges = json_array();
 
 
-    for (auto &node : vg.node_index) {
+    for (auto &node : vg.node_by_id) {
 //            cerr << "node " << node.second << endl;
         json_t* js_node = json_object();
 
-        std::string s_id = std::to_string(node.second);
+        std::string s_id = std::to_string(node.first);
         json_t* js_id = json_string(s_id.c_str());
-
+        
+        
+        
         json_object_set(js_node, "id", js_id);
         json_object_set(js_node, "name", js_id);
-
+        
+        
         json_t* js_data = json_object();
         json_object_set(js_data, "data", js_node);
         json_array_append(js_nodes, js_data);
@@ -51,17 +55,18 @@ static void visualize_graph(VG& vg, list<id_t>& reference) {
         id_t from = edge.first->from();
         id_t to = edge.first->to();
         
-        if(from == 55 || to == 55) {
-            continue;
-        }
+//        if(from == 55 || to == 55) {
+//            continue;
+//        }
 
         std::string s_id = std::to_string(from);
         std::string t_id = std::to_string(to);
         
-
-
         json_object_set(js_edge, "source", json_string(s_id.c_str()));
         json_object_set(js_edge, "target", json_string(t_id.c_str()));
+        
+        std::string e_label = std::to_string(w_graph.edge_weight.at(edge.first));
+        json_object_set(js_edge, "label", json_string(e_label.c_str()));
 
         json_t* js_data = json_object();
         json_object_set(js_data, "data", js_edge);
@@ -229,7 +234,7 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
         
     #ifdef debug
     {
-        visualize_graph(*this, reference);
+        visualize_graph(*this, weighted_graph, reference);
 //        for(auto& p : reference) {
 //            cerr << p << endl;
 //        }
