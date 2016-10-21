@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function(){ // on dom ready
               'text-valign': 'center',
               'color': 'white',
               'text-outline-width': 2,
-              'background-color': '#999',
+              'background-color': 'data(color)',
               'text-outline-color': '#999'
             })
           .selector('edge')

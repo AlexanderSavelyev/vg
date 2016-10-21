@@ -29,6 +29,14 @@ static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& refe
     json_t* js_graph = json_object();
     json_t* js_nodes = json_array();
     json_t* js_edges = json_array();
+    
+    std::set<id_t> ref_set;
+    
+    for(auto& r: reference) {
+        ref_set.insert(r);
+    }
+    
+    
 
 
     for (auto &node : vg.node_by_id) {
@@ -42,6 +50,11 @@ static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& refe
         
         json_object_set(js_node, "id", js_id);
         json_object_set(js_node, "name", js_id);
+        if(ref_set.find(node.first) != ref_set.end()) {
+            json_object_set(js_node, "color", json_string("green"));
+        } else {
+            json_object_set(js_node, "color", json_string("#999"));
+        }
         
         
         json_t* js_data = json_object();
@@ -55,10 +68,6 @@ static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& refe
         id_t from = edge.first->from();
         id_t to = edge.first->to();
         
-//        if(from == 55 || to == 55) {
-//            continue;
-//        }
-
         std::string s_id = std::to_string(from);
         std::string t_id = std::to_string(to);
         
