@@ -243,11 +243,11 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
         
     #ifdef debug
     {
-//        visualize_graph(*this, weighted_graph, reference);
+        visualize_graph(*this, weighted_graph, reference);
 //        for(auto& p : reference) {
 //            cerr << p << endl;
 //        }
-        std::cerr << pb2json(graph);
+//        std::cerr << pb2json(graph);
 //        serialize_to_ostream(cout, 200);
     }
     #endif
