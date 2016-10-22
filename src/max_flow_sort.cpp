@@ -247,16 +247,12 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
 //        for(auto& p : reference) {
 //            cerr << p << endl;
 //        }
-//        std::cerr << pb2json(graph);
-//        serialize_to_ostream(cout, 200);
     }
     #endif
 
     set<id_t> unsorted_nodes(nodes.begin(), nodes.end());
-    InOutGrowth growth = InOutGrowth(nodes, backbone, reference);
+    InOutGrowth growth (nodes, backbone, reference);
     find_in_out_web(sorted_nodes, growth, weighted_graph, unsorted_nodes);
-    
-
    
     while (sorted_nodes.size() != graph.node_size()) {
         cerr << "additional sorting for missing nodes" << endl;
@@ -275,7 +271,7 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
             reference_new.push_back(node.node->id());
         }
       
-        InOutGrowth growth_new = InOutGrowth(nodes_new, backbone_new, reference_new);
+        InOutGrowth growth_new (nodes_new, backbone_new, reference_new);
         WeightedGraph weighted_graph_new = get_weighted_graph(ref_name);
         find_in_out_web(sorted_nodes_new, growth_new, weighted_graph_new, unsorted_nodes_new);
 
