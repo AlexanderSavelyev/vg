@@ -197,7 +197,7 @@ void VG::fast_linear_sort(const string& ref_name, bool isGrooming)
 
         //add next node
         //sorted.push_back(next);
-        NodeTraversal node = NodeTraversal(node_by_id[next], false);
+        NodeTraversal node (node_by_id[next], false);
         sorted_nodes.push_back(node);
 
         //remove edges related with node
@@ -700,7 +700,7 @@ void VG::find_in_out_web(list<NodeTraversal>& sorted_nodes,
             if (!unsorted_nodes.count(id)) {
                 continue;
             }
-            NodeTraversal node = NodeTraversal(node_by_id[id], false);
+            NodeTraversal node (node_by_id[id], false);
             sorted_nodes.push_back(node);
             unsorted_nodes.erase(id);
         }
@@ -714,7 +714,7 @@ void VG::find_in_out_web(list<NodeTraversal>& sorted_nodes,
     //add source and sink nodes
     id_t source = graph.node_size() + 1;
     id_t sink = graph.node_size() + 2;
-    id_t graph_size = sink + 1;
+//    id_t graph_size = sink + 1;
 
     set<Edge*> out_joins;
     set<Edge*> in_joins;
@@ -776,7 +776,7 @@ void VG::find_in_out_web(list<NodeTraversal>& sorted_nodes,
     set<id_t> visited;
     visited.insert(backbone.begin(), backbone.end());
     for (auto &current_id: ref_path) {
-        NodeTraversal node = NodeTraversal(node_by_id[current_id], false);
+        NodeTraversal node (node_by_id[current_id], false);
         //out growth
         process_in_out_growth(edges_out_nodes, current_id, in_out_growth,
                     weighted_graph, visited, sorted_nodes, false, unsorted_nodes);
@@ -803,8 +803,8 @@ void VG::process_in_out_growth(EdgeMapping& nodes_to_edges, id_t current_id,
 
     if (!nodes_to_edges.count(current_id) || nodes_to_edges[current_id].size() == 0)
         return;
-    set<id_t> backbone = in_out_growth.backbone;
-    set<id_t> nodes = in_out_growth.nodes;
+    set<id_t>& backbone = in_out_growth.backbone;
+    set<id_t>& nodes = in_out_growth.nodes;
     set<id_t> new_backbone;
     list<id_t> new_ref_path;
     id_t start_node = current_id;
@@ -829,7 +829,6 @@ void VG::process_in_out_growth(EdgeMapping& nodes_to_edges, id_t current_id,
                 start_node = tmp;
                 weight = weighted_graph.edge_weight[out_edge];
                 next_edge = out_edge;
-
             }
         }
     }
@@ -841,7 +840,7 @@ void VG::process_in_out_growth(EdgeMapping& nodes_to_edges, id_t current_id,
     }
     if (!reverse)
         new_ref_path.reverse();
-    InOutGrowth growth = InOutGrowth(web, new_backbone, new_ref_path);
+    InOutGrowth growth (web, new_backbone, new_ref_path);
     find_in_out_web(sorted_nodes, growth, weighted_graph, unsorted_nodes);
     
 }
