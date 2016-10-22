@@ -689,9 +689,9 @@ void VG::find_in_out_web(list<NodeTraversal>& sorted_nodes,
                             WeightedGraph& weighted_graph,
                             set<id_t>& unsorted_nodes) {
 
-    set<id_t> backbone = in_out_growth.backbone;
-    set<id_t> nodes = in_out_growth.nodes;
-    list<id_t> ref_path = in_out_growth.ref_path;
+    set<id_t>& backbone = in_out_growth.backbone;
+    set<id_t>& nodes = in_out_growth.nodes;
+    list<id_t>& ref_path = in_out_growth.ref_path;
 
     //for efficiency if size of the backbone == size of the nodes
     //we just add all backbone to sorted nodes and quit
