@@ -21,7 +21,7 @@ using namespace gfak;
 
 #ifdef debug
 
-static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& reference) {
+static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, VG::InOutGrowth& io_growth) {
 //        cerr << "######## Start debug test input any symbol\n";
     json_t* js_root = json_object();
     
@@ -30,14 +30,17 @@ static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& refe
     json_t* js_nodes = json_array();
     json_t* js_edges = json_array();
     
-    std::set<id_t> ref_set;
+    auto& ref_path = vg.paths.get_path("ref");
+    ref_path.reverse();
     
-    for(auto& r: reference) {
-        ref_set.insert(r);
+    std::set<id_t> ref_set;
+
+    for(auto const &mapping : ref_path) {
+        ref_set.insert(mapping.position().node_id());
     }
     
-    
-
+//    auto& ref_set = io_growth.backbone;
+    auto& nodes = io_growth.nodes;
 
     for (auto &node : vg.node_by_id) {
 //            cerr << "node " << node.second << endl;
@@ -46,12 +49,12 @@ static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& refe
         std::string s_id = std::to_string(node.first);
         json_t* js_id = json_string(s_id.c_str());
         
-        
-        
         json_object_set(js_node, "id", js_id);
         json_object_set(js_node, "name", js_id);
         if(ref_set.find(node.first) != ref_set.end()) {
             json_object_set(js_node, "color", json_string("green"));
+        } else if (nodes.find(node.first) != nodes.end()) {
+            json_object_set(js_node, "color", json_string("cyan"));
         } else {
             json_object_set(js_node, "color", json_string("#999"));
         }
@@ -89,7 +92,7 @@ static void visualize_graph(VG& vg, VG::WeightedGraph& w_graph, list<id_t>& refe
     
     json_t* js_ref = json_array();
     
-    for(auto& r: reference) {
+    for(auto& r: ref_set) {
         string rs = std::to_string(r);
         json_array_append(js_ref, json_string(rs.c_str()));
     }
@@ -241,14 +244,7 @@ void VG::max_flow_sort(list<NodeTraversal>& sorted_nodes, const string& ref_name
     }
     
         
-    #ifdef debug
-    {
-        visualize_graph(*this, weighted_graph, reference);
-//        for(auto& p : reference) {
-//            cerr << p << endl;
-//        }
-    }
-    #endif
+
 
     set<id_t> unsorted_nodes(nodes.begin(), nodes.end());
     InOutGrowth growth (nodes, backbone, reference);
@@ -692,6 +688,15 @@ void VG::find_in_out_web(list<NodeTraversal>& sorted_nodes,
     set<id_t>& backbone = in_out_growth.backbone;
     set<id_t>& nodes = in_out_growth.nodes;
     list<id_t>& ref_path = in_out_growth.ref_path;
+    
+        #ifdef debug
+    {
+        visualize_graph(*this, weighted_graph, in_out_growth);
+//        for(auto& p : reference) {
+//            cerr << p << endl;
+//        }
+    }
+    #endif
 
     //for efficiency if size of the backbone == size of the nodes
     //we just add all backbone to sorted nodes and quit
@@ -728,7 +733,7 @@ void VG::find_in_out_web(list<NodeTraversal>& sorted_nodes,
         for (auto const &edge : edges_out_nodes[node]) {
             if (!nodes.count(edge->to())) {
                 continue;
-            }
+            } 
             current_weight += edge_weight[edge];
             if (backbone.count(node) && !backbone.count(edge->to())) {
                 out_joins.insert(edge);
